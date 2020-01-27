@@ -19,6 +19,7 @@
 * [Bowtie2](https://anaconda.org/bioconda/bowtie2) | v2.3.5
 * [samtools ≥ v1.9](https://anaconda.org/bioconda/samtools) | v1.10
 * [Subread](https://anaconda.org/bioconda/subread) (featureCounts) | v1.6.4
+* [goomba](https://github.com/jolespin/goomba) | v2020.01
 
 ### Inputs:
 * R1/R2 (fastq[.gz])
