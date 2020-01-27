@@ -1,0 +1,8 @@
+step	category	name	executable
+1	preprocessing	repair.sh	source /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/activate star_env  &&  repair.sh
+1	preprocessing	clumpify.sh	source /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/activate star_env  &&  clumpify.sh
+1	preprocessing	kneaddata	source /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/activate star_env && kneaddata
+1	preprocessing	kneaddata_contamination_db	/usr/local/scratch/METAGENOMICS/jespinoz/db/genomes/human/GRCh38.p13/
+2	mapping	STAR	source /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/activate star_env  && STAR
+2	mapping	samtools	source /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/activate star_env  && samtools
+3	quantify	featureCounts	source /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/activate star_env  && featureCounts
