@@ -275,3 +275,12 @@ Duration: 00:00:26
 Total duration: 00:00:26
 ........................
 ```
+
+### JCVI Internal Users:
+```
+# Activate conda environment
+source /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/activate star_env
+
+# Run executable
+star_pipeline.py -h
+```
