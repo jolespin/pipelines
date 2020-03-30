@@ -16,13 +16,13 @@ except ImportError:
 import pandas as pd
 import numpy as np
 
-# Goomba
-from goomba import *
+from soothsayer_utils import *
+from genopype import *
 
 pd.options.display.max_colwidth = 100
 # from tqdm import tqdm
 __program__ = os.path.split(sys.argv[0])[-1]
-__version__ = "2020.01.15"
+__version__ = "2020.03.30"
 
 
 # .............................................................................
@@ -120,6 +120,7 @@ def get_featurecounts_cmd(input_filepaths, output_filepaths, output_directory, d
    "-F GTF",
    "--tmpDir {}".format(directories["tmp"]),
    "-T {}".format(opts.n_jobs),
+   {True:"-M", False:""}[opts.multimapping],
     opts.featurecounts_options,
     input_filepaths[0],
     "&&",
@@ -362,6 +363,7 @@ def main(args=None):
 
     # featureCounts
     parser_featurecounts = parser.add_argument_group('featureCounts arguments')
+    parser_featurecounts.add_argument("-M", "--multimapping", action="store_true", help = "For a multi- mapping read, all its reported alignments will be counted.")
     parser_featurecounts.add_argument("--featurecounts_options", type=str, default="", help="featureCounts | More options (e.g. --arg 1 ) [Default: ''] | http://bioinf.wehi.edu.au/featureCounts/")
 
     # Options
