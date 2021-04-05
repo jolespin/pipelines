@@ -5,5 +5,5 @@
                                                                   
 ```
 ### Contents:
-* [STAR Pipeline](star_pipeline/README.md)
-	- Preprocess paired end reads , map reads to exons via `STAR`, convert `.sam` to `.bam` , and count features.
+* [Bowtie2 Pipeline](bowtie2_pipeline/README.md)
+	- Preprocess paired end reads, map reads to exons via `Bowtie2`, convert `.sam` to sorted `.bam` , and count features via `featureCounts`.
