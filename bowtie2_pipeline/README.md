@@ -21,11 +21,21 @@
 * [soothsayer_utils](https://github.com/jolespin/soothsayer_utils) | v2020.03.29
 * [genopype](https://github.com/jolespin/genopype) | v2020.03.27
 
+### Set up environment: 
+
+```
+conda env create -n bowtie2_env -f environment.yml -y
+```
+
 ### Inputs:
 * R1/R2 (fastq[.gz])
 * Reference assembly (.fasta)
 * Reference annotation (.gtf)
 * Bowtie2 Index (Prefix)
+
+### Accessory Scripts: 
+* `fasta_to_saf.py` - Converts fasta to SAF format for mapping without an annotation (e.g. contigs)
+* `merge_featurecounts.py` - Merges featureCounts counts or summary tables
 
 ### Config: 
 Tab-separated file that contains name and executable. 
@@ -308,5 +318,6 @@ bowtie2_pipeline.py -h
 ```
 
 ### Pending: 
+* Take in manifest file for batch jobs
 * Cannot handle interleaved reads
 * No option to use unpaired reads
