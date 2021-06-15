@@ -24,7 +24,7 @@
 ### Set up environment: 
 
 ```
-conda env create -n bowtie2_env -f environment.yml -y
+conda env create -n hisat2_env -f environment.yml -y
 ```
 
 ### Inputs:
@@ -60,10 +60,10 @@ These are all in the same `conda` environment so if this is the case, please jus
 
 ### Usage: 
 ```
-(bowtie2_env) -bash-4.1$ bowtie2_pipeline.py -h
-usage: bowtie2_pipeline.py -1 <r1.fq> -2 <r2.fq> -n <name> -o <output_directory> --ref_assembly <reference.fa> --ref_annotation <reference.gtf> --bowtie2_index <bowtie2_index/>
+(hisat2_env) -bash-4.2$ hisat2_pipeline.py -h
+usage: hisat2_pipeline.py -1 <r1.fq> -2 <r2.fq> -n <name> -o <output_directory> --ref_assembly <reference.fa> --ref_annotation <reference.gtf> --hisat2_index <hisat2_index/>
 
-    Running: bowtie2_pipeline.py v2021.04.04 via Python v3.8.8 | /usr/local/devel/ANNOTATION/jespinoz/anaconda3/envs/bowtie2_env/bin/python
+    Running: hisat2_pipeline.py v2021.06.15 via Python v3.8.10 | /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/python
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -71,17 +71,17 @@ optional arguments:
 Required arguments:
   -1 R1, --r1 R1        path/to/r1.fq
   -2 R2, --r2 R2        path/to/r2.fq
-  -12 INTERLEAVED_READS, --interleaved_reads INTERLEAVED_READS
-                        path/to/interleaved.fq
+  -U UNPAIRED_READS, --unpaired_reads UNPAIRED_READS
+                        path/to/unpaired_reads.fq. Can be comma separated list
   -n NAME, --name NAME  Name of sample
   -o PROJECT_DIRECTORY, --project_directory PROJECT_DIRECTORY
-                        path/to/project_directory [Default: ./mapping_output]
-  --ref_assembly REF_ASSEMBLY
+                        path/to/project_directory [Default: ./hisat2_output]
+  -R REF_ASSEMBLY, --ref_assembly REF_ASSEMBLY
                         path/to/reference.fasta
-  --ref_annotation REF_ANNOTATION
+  -A REF_ANNOTATION, --ref_annotation REF_ANNOTATION
                         path/to/reference.gtf
-  --bowtie2_index BOWTIE2_INDEX
-                        path/to/bowtie2_index
+  -I HISAT2_INDEX, --hisat2_index HISAT2_INDEX
+                        path/to/hisat2_index
 
 Utility arguments:
   --path_config PATH_CONFIG
@@ -105,14 +105,14 @@ Kneaddata arguments:
                         Bowtie2 | More options (e.g. --arg 1 ) [Default: '']
                         http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml
 
-Bowtie2 arguments:
-  --bowtie2_options BOWTIE2_OPTIONS
-                        Bowtie2 | More options (e.g. --arg 1 ) [Default: ''] | http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml
+HISAT2 arguments:
+  --hisat2_options HISAT2_OPTIONS
+                        HISAT2 | More options (e.g. --arg 1 ) [Default: ''] | http://daehwankimlab.github.io/hisat2/
 
 featureCounts arguments:
-  --attribute_type ATTRIBUTE_TYPE
+  -g ATTRIBUTE_TYPE, --attribute_type ATTRIBUTE_TYPE
                         Attribute type in GTF/GFF file. Use 'ID' for prodigal. [Default: gene_id]
-  --feature_type FEATURE_TYPE
+  -t FEATURE_TYPE, --feature_type FEATURE_TYPE
                         Feature type in GTF/GFF file. Use 'CDS' for prodigal. Use 'gene' for prokaryotic genomes from NCBI. [Default: exon]
   --featurecounts_options FEATURECOUNTS_OPTIONS
                         featureCounts | More options (e.g. --arg 1 ) [Default: ''] | http://bioinf.wehi.edu.au/featureCounts/

@@ -125,6 +125,7 @@ def get_hisat2_cmd(input_filepaths, output_filepaths, output_directory, director
     "--un-conc-gz {}".format(os.path.join(output_directory, "unmapped_%.{}.gz".format(unmapped_ext))),
     # "--un-gz {}".format(os.path.join(output_directory, "unmapped_singletons_%{}.gz".format(unmapped_ext))),
     "--seed {}".format(opts.random_state),
+    "--summary-file {}".format(os.path.join(output_directory, "summary.txt")),
     ]
     if ignore_quals:
         cmd.append("-f")
