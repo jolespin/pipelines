@@ -28,7 +28,6 @@ __version__ = "2021.06.15"
 # .............................................................................
 # Notes
 # .............................................................................
-# * Still needs unpaired
 # * Make batch version that takes in a manifest file
 # .............................................................................
 # Primordial
@@ -88,8 +87,8 @@ def get_kneaddata_cmd(input_filepaths, output_filepaths, output_directory, direc
     return cmd
 
 
-# Bowtie2
-def get_bowtie2_cmd(input_filepaths, output_filepaths, output_directory, directories, opts):
+# HISAT2
+def get_hisat2_cmd(input_filepaths, output_filepaths, output_directory, directories, opts):
     os.environ["TMPDIR"] = directories["tmp"]
 
     # Is fasta or fastq?
@@ -108,18 +107,17 @@ def get_bowtie2_cmd(input_filepaths, output_filepaths, output_directory, directo
     # Clear temporary directory just in case
     "rm -rf {}".format(os.path.join(directories["tmp"], "*")),
     "&&",
-    # Bowtie2
+    # HISAT2
     "(",
-    os.environ["bowtie2"],
-   "-x {}".format(opts.bowtie2_index),
+    os.environ["hisat2"],
+   "-x {}".format(opts.hisat2_index),
     ]
     if len(input_filepaths) == 1:
-        cmd.append("--interleaved {}".format(input_filepaths[0]))
+        cmd.append("-U {}".format(input_filepaths[0]))
     else:
         cmd.append("-1 {}".format(input_filepaths[0]))
         cmd.append("-2 {}".format(input_filepaths[1]))
 
-    # Do something with unpaired reads eventually
 
     cmd += [
    "--threads {}".format(opts.n_jobs),
@@ -131,7 +129,7 @@ def get_bowtie2_cmd(input_filepaths, output_filepaths, output_directory, directo
     if ignore_quals:
         cmd.append("-f")
     cmd += [
-        opts.bowtie2_options,
+        opts.hisat2_options,
     ")",
     # Convert to sorted BAM
     "|",
@@ -225,7 +223,7 @@ def add_executables_to_environment(opts):
                 "kneaddata",
                 # "kneaddata_contamination_db",
                 # 2
-                "bowtie2",
+                "hisat2",
                 "samtools",
                 # 3
                 "featureCounts",
@@ -237,7 +235,7 @@ def add_executables_to_environment(opts):
             executables[name] = os.path.join(os.environ["CONDA_PREFIX"], "bin", name)
     else:
         if opts.path_config is None:
-            opts.path_config = os.path.join(opts.script_directory, "bowtie2_pipeline_config.tsv")
+            opts.path_config = os.path.join(opts.script_directory, "hisat2_pipeline_config.tsv")
         opts.path_config = format_path(opts.path_config)
         assert os.path.exists(opts.path_config), "config file does not exist.  Have you created one in the following directory?\n{}\nIf not, either create one, check this filepath:{}, or give the path to a proper config file using --path_config".format(opts.script_directory, opts.path_config)
         assert os.stat(opts.path_config).st_size > 1, "config file seems to be empty.  Please add 'name' and 'executable' columns for the following program names: {}".format(required_executables)
@@ -269,7 +267,7 @@ def create_pipeline(opts, directories, f_cmds):
     # Primordial
     # .................................................................
     # Commands file
-    pipeline = ExecutablePipeline(name="Bowtie2 Mapping Pipeline", description=opts.name, f_cmds=f_cmds, checkpoint_directory=directories["checkpoints"], log_directory=directories["log"])
+    pipeline = ExecutablePipeline(name="HISAT2 Mapping Pipeline", description=opts.name, f_cmds=f_cmds, checkpoint_directory=directories["checkpoints"], log_directory=directories["log"])
 
     if not opts.skip_preprocess:
         # =========
@@ -313,17 +311,17 @@ def create_pipeline(opts, directories, f_cmds):
                     validate_outputs=True,
         )
     else:
-        if opts.interleaved_reads:
-            output_filepaths = [opts.interleaved_reads]
+        if opts.unpaired_reads:
+            output_filepaths = [opts.unpaired_reads]
         else:
             output_filepaths = [opts.r1, opts.r2]
 
 
     if not opts.preprocess_only:
         # ==========
-        # Bowtie2
+        # HISAT2
         # ==========
-        program = "bowtie2"
+        program = "hisat2"
         # Add to directories
         output_directory = directories[("intermediate",  program)] = create_directory(os.path.join(directories["intermediate"], "{}_output".format(program)))
 
@@ -333,7 +331,7 @@ def create_pipeline(opts, directories, f_cmds):
 
         # i/o
         input_filepaths = output_filepaths
-        assert len(input_filepaths) in {1,2}, "`input_filepaths` at this stage must have 1 file for interleaved or 2 files for paired:\n{}".format(input_filepaths)
+        assert len(input_filepaths) in {1,2}, "`input_filepaths` at this stage must have 1 file for unpaired or 2 files for paired:\n{}".format(input_filepaths)
 
         output_filenames = ["mapped.sorted.bam"]
         output_filepaths = list(map(lambda filename: os.path.join(output_directory, filename), output_filenames))
@@ -346,7 +344,7 @@ def create_pipeline(opts, directories, f_cmds):
             "directories":directories,
         }
 
-        cmd = get_bowtie2_cmd(**params)
+        cmd = get_hisat2_cmd(**params)
         pipeline.add_step(
                     id=program,
                     description = description,
@@ -409,8 +407,8 @@ def create_pipeline(opts, directories, f_cmds):
 
         # i/o
         input_filepaths = [
-            os.path.join(directories[("intermediate", "bowtie2")], "mapped.sorted.bam"),
-            # os.path.join(directories[("intermediate", "bowtie2")], "*"),
+            os.path.join(directories[("intermediate", "hisat2")], "mapped.sorted.bam"),
+            # os.path.join(directories[("intermediate", "hisat2")], "*"),
             os.path.join(directories[("intermediate", "featurecounts")], "featurecounts.tsv.gz"),
             os.path.join(directories[("intermediate", "featurecounts")], "featurecounts.tsv.summary"),
 
@@ -450,9 +448,9 @@ def configure_parameters(opts, directories):
         assert not opts.skip_preprocess, "Conflicting logic with `--preprocess_only` and `--skip_preprocess`"
     if bool(opts.r1):
         assert opts.r1 != opts.r2, "You probably mislabeled the input files because `r1` should not be the same as `r2`: {}".format(opts.r1)
-        assert not bool(opts.interleaved_reads), "Cannot have --interleaved_reads if --r1"
-    if not opts.bowtie2_index:
-        opts.bowtie2_index = opts.ref_assembly
+        assert not bool(opts.unpaired_reads), "Cannot have --unpaired_reads if --r1.  Note, this behavior may be changed in the future but it's an adaptation of interleaved reads."
+    if not opts.hisat2_index:
+        opts.hisat2_index = opts.ref_assembly
     if not opts.preprocess_only:
         assert opts.ref_assembly is not None, "Please provide --ref_assembly for mapping"
         if opts.ref_annotation is None:
@@ -467,7 +465,7 @@ def main(args=None):
     # Path info
     description = """
     Running: {} v{} via Python v{} | {}""".format(__program__, __version__, sys.version.split(" ")[0], sys.executable)
-    usage = "{} -1 <r1.fq> -2 <r2.fq> -n <name> -o <output_directory> --ref_assembly <reference.fa> --ref_annotation <reference.gtf> --bowtie2_index <bowtie2_index/>".format(__program__)
+    usage = "{} -1 <r1.fq> -2 <r2.fq> -n <name> -o <output_directory> --ref_assembly <reference.fa> --ref_annotation <reference.gtf> --hisat2_index <hisat2_index/>".format(__program__)
     epilog = "Copyright 2021 Josh L. Espinoza (jespinoz@jcvi.org)"
 
     # Parser
@@ -476,16 +474,14 @@ def main(args=None):
     parser_required = parser.add_argument_group('Required arguments')
     parser_required.add_argument("-1","--r1", type=str, help = "path/to/r1.fq")
     parser_required.add_argument("-2","--r2", type=str, help = "path/to/r2.fq")
-    parser_required.add_argument("-12","--interleaved_reads", type=str, help = "path/to/interleaved.fq")
-    # parser_required.add_argument("-U","--unpaired_reads", type=str, help = "path/to/unpaired_reads.fq. Can be comma separated list")
-    # parser_required.add_argument("--include_unpaired_reads",  action="store_true", help = "Include unpaired reads")
+    parser_required.add_argument("-U","--unpaired_reads", type=str, help = "path/to/unpaired_reads.fq. Can be comma separated list")
 
 
     parser_required.add_argument("-n", "--name", type=str, help="Name of sample", required=True)
-    parser_required.add_argument("-o","--project_directory", type=str, default="./bowtie2_output", help = "path/to/project_directory [Default: ./bowtie2_output]")
+    parser_required.add_argument("-o","--project_directory", type=str, default="./hisat2_output", help = "path/to/project_directory [Default: ./hisat2_output]")
     parser_required.add_argument("-R", "--ref_assembly", type=str, required=False, help = "path/to/reference.fasta" ) # ; or (2) a directory of fasta files [Must all have the same extension.  Use `query_ext` argument]
     parser_required.add_argument("-A", "--ref_annotation",type=str, required=False, help="path/to/reference.gtf")
-    parser_required.add_argument("-I", "--bowtie2_index",type=str, required=False, help="path/to/bowtie2_index")
+    parser_required.add_argument("-I", "--hisat2_index",type=str, required=False, help="path/to/hisat2_index")
 
     # Utility
     parser_utility = parser.add_argument_group('Utility arguments')
@@ -503,12 +499,13 @@ def main(args=None):
     parser_kneaddata.add_argument("--kneaddata_options", type=str, default="", help="Kneaddata | More options (e.g. --arg 1 ) [Default: ''] | https://bitbucket.org/biobakery/kneaddata/wiki/Home")
     parser_kneaddata.add_argument("--kneaddatabowtie2_options", type=str, default="", help="Bowtie2 | More options (e.g. --arg 1 ) [Default: '']\nhttp://bowtie-bio.sourceforge.net/bowtie2/manual.shtml")
 
-    # Bowtie2
-    parser_bowtie2 = parser.add_argument_group('Bowtie2 arguments')
-    parser_bowtie2.add_argument("--bowtie2_options", type=str, default="", help="Bowtie2 | More options (e.g. --arg 1 ) [Default: ''] | http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml")
+    # HISAT2
+    parser_hisat2 = parser.add_argument_group('HISAT2 arguments')
+    parser_hisat2.add_argument("--hisat2_options", type=str, default="", help="HISAT2 | More options (e.g. --arg 1 ) [Default: ''] | http://daehwankimlab.github.io/hisat2/")
 
     # featureCounts
     parser_featurecounts = parser.add_argument_group('featureCounts arguments')
+    # parser_featurecounts.add_argument("--annotation_type", type=str, default="GTF", help = "Annotation file type. Use 'SAF' when there are no features (fasta_to_saf.py helper script converts fasta to saf). [Default: GTF]")
     parser_featurecounts.add_argument("-g", "--attribute_type", type=str, default="gene_id", help = "Attribute type in GTF/GFF file. Use 'ID' for prodigal. [Default: gene_id]")
     parser_featurecounts.add_argument("-t", "--feature_type", type=str, default="exon", help = "Feature type in GTF/GFF file. Use 'CDS' for prodigal. Use 'gene' for prokaryotic genomes from NCBI. [Default: exon]")
     parser_featurecounts.add_argument("--featurecounts_options", type=str, default="", help="featureCounts | More options (e.g. --arg 1 ) [Default: ''] | http://bioinf.wehi.edu.au/featureCounts/")
@@ -537,7 +534,7 @@ def main(args=None):
 
 
     # Info
-    print(format_header("Bowtie2 Pipeline", "="), file=sys.stdout)
+    print(format_header("HISAT2 Pipeline", "="), file=sys.stdout)
     print(format_header("Configuration:", "-"), file=sys.stdout)
     print(format_header("Name: {}".format(opts.name), "."), file=sys.stdout)
     print("Python version:", sys.version.replace("\n"," "), file=sys.stdout)

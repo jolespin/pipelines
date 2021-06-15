@@ -1,0 +1,8 @@
+step	category	name	executable
+1	preprocessing	reformat.sh	source /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/activate hisat2_env  &&  reformat.sh
+1	preprocessing	repair.sh	source /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/activate hisat2_env  &&  repair.sh
+1	preprocessing	clumpify.sh	source /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/activate hisat2_env  &&  clumpify.sh
+1	preprocessing	kneaddata	source /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/activate hisat2_env && kneaddata
+2	mapping	hisat2	source /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/activate hisat2_env  && hisat2
+2	mapping	samtools	source /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/activate hisat2_env  && samtools
+3	quantify	featureCounts	source /usr/local/devel/ANNOTATION/jespinoz/anaconda3/bin/activate hisat2_env  && featureCounts
