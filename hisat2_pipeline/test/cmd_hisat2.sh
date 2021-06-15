@@ -1,0 +1,1 @@
+hisat2_pipeline.py -1 reads_1.fq.gz -2 reads_2.fq.gz -n test --ref_assembly test.fa --n_jobs 4

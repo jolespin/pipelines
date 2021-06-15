@@ -1,0 +1,19 @@
+Decompressing gzipped file ...
+
+Decompressing gzipped file ...
+
+Reformatting file sequence identifiers ...
+
+Reformatting file sequence identifiers ...
+
+Initial number of reads ( /local/ifs3_scratch/CORE/jespinoz/Oral/testing/hisat2_output/test/preprocessing/reformatted_identifiers0g0rxg9l_decompressed_72z3nmv__reads_1 ): 100000.0
+Initial number of reads ( /local/ifs3_scratch/CORE/jespinoz/Oral/testing/hisat2_output/test/preprocessing/reformatted_identifiers_91j9rwz_decompressed_e2wfzwq8_reads_2 ): 100000.0
+Running Trimmomatic ... 
+Total reads after trimming ( /local/ifs3_scratch/CORE/jespinoz/Oral/testing/hisat2_output/test/preprocessing/kneaddata.trimmed.1.fastq ): 100000.0
+Total reads after trimming ( /local/ifs3_scratch/CORE/jespinoz/Oral/testing/hisat2_output/test/preprocessing/kneaddata.trimmed.2.fastq ): 100000.0
+Bypass decontamination
+
+Final output files created: 
+/local/ifs3_scratch/CORE/jespinoz/Oral/testing/hisat2_output/test/preprocessing/kneaddata.trimmed.1.fastq
+/local/ifs3_scratch/CORE/jespinoz/Oral/testing/hisat2_output/test/preprocessing/kneaddata.trimmed.2.fastq
+
