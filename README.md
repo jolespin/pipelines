@@ -10,3 +10,5 @@
 	- Preprocess paired end reads, map reads to references via `HISAT2`, convert `.sam` to sorted `.bam` , and count features via `featureCounts`.
 * [Bowtie2 Pipeline](bowtie2_pipeline/README.md)
 	- Preprocess paired end reads, map reads to references via `Bowtie2`, convert `.sam` to sorted `.bam` , and count features via `featureCounts`.
+* [Scripts](scripts/README.md)
+	- Collection of bioinformatics that can be used to speed up your workflow.
