@@ -24,6 +24,9 @@ def main(args=None):
     parser.add_argument("-o","--output", type=str, default="stdout", help = "path/to/clusters.tsv [Default: stdout]")
     parser.add_argument("-a","--ani", type=str, default="95",  help = "FastANI threshold.  Can be either scalar or comma-separated list (e.g., 95,96.5) [Default: 95]")
     # parser.add_argument("-p","--cluster_prefix", type=str, default="",  help = "Cluster prefix [Default: '']")
+    parser.add_argument("-p", "--cluster_prefix", type=str, default="SLC", help="Cluster prefix [Default: 'SLC")
+    parser.add_argument("-s", "--cluster_suffix", type=str, default="", help="Cluster suffix [Default: '")
+
     parser.add_argument("-x","--fasta_extension", type=str, default="fa",  help = "Fasta extension [Default: 'fa']")
     parser.add_argument("--export_pickle", type=str,   help = "prefix/to/pickle output files")
     parser.add_argument("--export_edgelist", type=str,   help = "prefix/to/edgelist output files")
@@ -31,6 +34,8 @@ def main(args=None):
     parser.add_argument("--include", type=str,  help = "path/to/list of identifiers without header (Note, this happens after name trimming)")
     parser.add_argument("--interval_type", type=str, default="open",  help = "Interval type either 'open' (>) or 'closed' (>=)  [Default: open]")
     parser.add_argument("--no_trim", action="store_true", help = "Don't trim the name.  Trimming includes removing prefix paths and file extension")
+    parser.add_argument("--no_header", action="store_true", help = "Don't add header to output.  Not recommended when running multiple ANIs")
+
     # Options
     opts = parser.parse_args()
     opts.script_directory  = script_directory
@@ -89,8 +94,12 @@ def main(args=None):
                 if f_interval(ani, tol):
                     graph.add_edge(id_query, id_target, weight=ani)
         # Get connected components
-        for id_cluster, nodes in enumerate(sorted(nx.connected_components(graph), key=len, reverse=True)):
-            # id_cluster = "{}{}".format(opts.cluster_prefix, id_cluster)
+        for id_cluster, nodes in enumerate(sorted(nx.connected_components(graph), key=len, reverse=True), start=1):
+            # Add cluster prefix and suffix
+            if bool(opts.cluster_prefix):
+                id_cluster =  "{}{}".format(opts.cluster_prefix, id_cluster)
+            if bool(opts.cluster_suffix):
+                id_cluster =  "{}{}".format( id_cluster, opts.cluster_suffix)
             for node in nodes:
                 connected_components[tol_label][node] = id_cluster
 
@@ -105,7 +114,10 @@ def main(args=None):
         
     connected_components = pd.DataFrame(connected_components)
     connected_components = connected_components.sort_values(list(connected_components.columns))
-    connected_components.to_csv(f_out, sep="\t")
+    if opts.no_header:
+        connected_components.to_csv(f_out, sep="\t", header=None)
+    else:
+        connected_components.to_csv(f_out, sep="\t")
 
     # Close files
     if f_in is not sys.stdin:

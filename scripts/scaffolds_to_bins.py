@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, os, glob, argparse 
+import sys, os, glob, argparse, gzip
 from collections import OrderedDict
 import pandas as pd
 
@@ -20,12 +20,12 @@ def main(args=None):
     parser = argparse.ArgumentParser(description=description, usage=usage, epilog=epilog, formatter_class=argparse.RawTextHelpFormatter)
     # Pipeline
     parser.add_argument("-i","--binning_directory", type=str, help = "path/to/binning_directory")
-    parser.add_argument("-x","--extension", default="fa", type=str, help = "Binning file extension [Default: fa")
+    parser.add_argument("-x","--extension", default="fa", type=str, help = "Binning file extension [Default: fa]")
     parser.add_argument("--sep", type=str, default="\t",  help = "Seperator [Default: '\t'")
-    parser.add_argument("--scaffold_column_name", type=str, default="Scaffold", help="Scaffold column name [Default: Scaffold")
-    parser.add_argument("--bin_column_name", type=str, default="Bin", help="Bin column name [Default: Bin")
-    parser.add_argument("--column_order", type=str, default="scaffold,bin", help="Column order.  Specify either 'scaffold,bin' or 'bin,scaffold' [Default:scaffold,bin")
-    parser.add_argument("--bin_prefix", type=str, default="", help="Bin prefix [Default: '")
+    parser.add_argument("--scaffold_column_name", type=str, default="Scaffold", help="Scaffold column name [Default: Scaffold]")
+    parser.add_argument("--bin_column_name", type=str, default="Bin", help="Bin column name [Default: Bin]")
+    parser.add_argument("--column_order", type=str, default="scaffold,bin", help="Column order.  Specify either 'scaffold,bin' or 'bin,scaffold' [Default:scaffold,bin]")
+    parser.add_argument("--bin_prefix", type=str, default="", help="Bin prefix [Default: '']")
     parser.add_argument("--header", action="store_true", help="Specify if header should be in output")
 
     # Options
@@ -41,11 +41,22 @@ def main(args=None):
     for filepath in glob.glob(os.path.join(opts.binning_directory, "*.{}".format(opts.extension))):
         id_bin = filepath.split("/")[-1][:-1*(len(opts.extension)+1)]
         id_bin = "{}{}".format(opts.bin_prefix, id_bin)
-        with open(filepath, "r") as f:
-            for line in f:
+
+        if opts.extension.endswith(".gz"):
+            f = gzip.open(filepath, "rt")
+        else:
+            f = open(filepath, "r")
+        for line in f:
+            if opts.header:
                 if line.startswith(">"):
                     id_scaffold = line.strip()[1:]
                     scaffold_to_bin[id_scaffold] = id_bin 
+            else:
+                if line.startswith(">"):
+                    id_scaffold = line.strip()[1:].split(" ")[0]
+                    scaffold_to_bin[id_scaffold] = id_bin 
+        f.close()
+        
     df = pd.Series(scaffold_to_bin).to_frame(opts.bin_column_name)
     df.index.name = opts.scaffold_column_name 
     df = df.reset_index()

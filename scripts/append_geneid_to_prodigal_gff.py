@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys, os, glob, argparse 
 from collections import OrderedDict
+# import pandas as pd
 
 __program__ = os.path.split(sys.argv[0])[-1]
 __version__ = "2021.06.19"
@@ -50,6 +51,10 @@ def main(args=None):
             id = line.split("ID=")[1].split(";")[0]
             print(
                 line,
+                "contig_id",
+                "=",
+                id_contig,
+                ";",
                 opts.attribute, 
                 "=",
                 id_contig,
