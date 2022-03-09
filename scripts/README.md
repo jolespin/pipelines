@@ -23,6 +23,6 @@ Collection of bioinformatics that can be used to speed up your workflow.
 	- Appends `gene_id` to [Prodigal](https://github.com/hyattpd/Prodigal) GFF output.  Useful when combining results from multiple Prodigal runs (e.g. metagenomic assembled genomes). 
 	- Dependencies: None
 
-* `convert_metaeuk.py`
-	- Simplify the identifiers for [MetaEuk](https://github.com/soedinglab/metaeuk). Input is `--cds` and `--protein` then it generates: 1) gene\_models.ffn; 2) gene\_models.faa; 3) gene\_models.gff; and 4) identifier\_mapping.tsv
+* `simplify_metaeuk_identifiers.py`
+	- Simplify the identifiers for [MetaEuk](https://github.com/soedinglab/metaeuk) to make BUSCO style `[id_contig]_[gene_start]:[gene_end]`. Input is `--cds` and `--protein` then it generates: 1) gene\_models.ffn; 2) gene\_models.faa; 3) gene\_models.gff; and 4) identifier\_mapping.tsv
 	- Dependencies: `pandas`, `BioPython`
